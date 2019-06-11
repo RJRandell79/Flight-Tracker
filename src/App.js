@@ -1,12 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import DeckGL, { IconLayer } from 'deck.gl';
+import { StaticMap } from 'react-map-gl';
+import * as d3 from 'd3';
+
+const MAPBOX_ACCESS_TOKEN = '';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
