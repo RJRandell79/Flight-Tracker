@@ -6,6 +6,8 @@ import * as d3 from 'd3';
 import Base64 from 'base-64';
 import { CONFIG } from './config.js';
 
+import FlightData from './FlightData';
+
 import Airplane from './airplane-icon.png';
 import destinationPoint from './destinationPoint.js';
 
@@ -24,15 +26,22 @@ const initialViewState = {
 
 class App extends Component {
     state = {
-        airplanes: []
+        airplanes: [],
+        flightinfo: []
     };
     currentFrame = null;
     timer = null;
-    fetchEverySeconds = 10;
+    fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
 
-    componentDidMount() {
-        this.fetchData();
+    fetchFlightData = ( flight ) => {
+        this.setState({
+            flightinfo: [
+                flight.object.callsign,
+                flight.object.altitude,
+                flight.object.velocity
+            ]
+        });
     }
 
     animationFrame = () => {
@@ -71,6 +80,7 @@ class App extends Component {
                 airplanes: states.map( d => ({
                     icao: d[ 0 ],
                     callsign: d[ 1 ],
+                    last_contact: d[ 4 ],
                     longitude: d[ 5 ],
                     latitude: d[ 6 ],
                     velocity: this.convertToMPH( d[ 9 ] ),
@@ -97,7 +107,7 @@ class App extends Component {
                 id: 'airplanes',
                 data: this.state.airplanes,
                 pickable: true,
-                onClick: ( info, event ) => console.log( 'Clicked:', info.object.icao ),
+                onClick: ( info, event ) => this.fetchFlightData( info ),
                 iconAtlas: Airplane,
                 iconMapping: {
                     airplane: {
@@ -108,9 +118,9 @@ class App extends Component {
                     }
                 },
                 sizeScale: 20,
-                getPosition: d => [ d.longitude, d.latitude, d.altitude ],
+                getPosition: d => [ d.longitude, d.latitude ],
                 getIcon: d => 'airplane',
-                getAngle: d => Math.round( d.true_track + 135 )
+                getAngle: d => -d.true_track
             }),
             new TextLayer({
                 id: 'callsigns',
@@ -167,13 +177,20 @@ class App extends Component {
         ];
 
         return(
-            <div onClick = { this.renderToolTip }>
-                <DeckGL initialViewState = { initialViewState } controller = { true } layers = { layers } onClick = { this._onClick }>
+            <div className="flights-container">
+                <DeckGL initialViewState = { initialViewState } controller = { true } layers = { layers } onClick={ this._onClick }>
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
+
+                <FlightData flight = { this.state.flightinfo } />
             </div>
         );
     }
+
+    componentDidMount() {
+        this.fetchData();
+    }
+
 }
 
 export default App;

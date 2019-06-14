@@ -1,0 +1,28 @@
+
+.flightdata {
+    position: absolute;
+    left: 25px;
+    bottom: 50px;
+    width: 350px;
+    height: 200px;
+    padding: 25px;
+    background: #F2F2F2;
+    box-shadow: 3px 3px 5px rgba( 0, 50, 0, 0.33 );
+}
+.flightdata .airline {
+    font-size: 12px;
+}
+.flightdata .origindestination {
+    overflow: hidden;
+}
+.flightdata .origindestination p {
+    float: left;
+    width: 50%;
+}
+.flightdata .origindestination p:last-of-type {
+    float: right;
+    text-align: right;
+}
+.flightdata p {
+    margin: 0 0 5px;
+}
