@@ -1,3 +1,5 @@
+/* Original base code: https://github.com/Swizec/webgl-airplanes-map/tree/master/src */
+
 import React, { Component } from 'react';
 import './App.css';
 import DeckGL, { IconLayer, TextLayer } from 'deck.gl';

@@ -15,8 +15,8 @@ class FlightData extends Component {
         this.setState({
             flight: {
                 callsign: props.flight[ 0 ],
-                altitude: props.flight[ 1 ] + 'ft',
-                speed: props.flight[ 2 ] + 'mph'
+                altitude: props.flight[ 1 ],
+                speed: props.flight[ 2 ]
             }
         })
     }
@@ -24,18 +24,18 @@ class FlightData extends Component {
     render() {
         return(
             <div className="flightdata">
-                <p>Flight Number: { this.state.flight.callsign }</p>
-                <p className="airline">Airline:</p>
+                <p>Flight Number: { this.state.flight.callsign === undefined ? 'N/A' : this.state.flight.callsign }</p>
+                <p className="airline">Airline: n/a</p>
                 <hr />
 
                 <div className="origindestination">
-                    <p>From:</p>
-                    <p>To:</p>
+                    <p>From: n/a</p>
+                    <p>To: n/a</p>
                 </div>
                 <hr />
 
-                <p>Calibrated altitude: { this.state.flight.altitude }</p>
-                <p>Ground speed: { this.state.flight.speed }</p>
+                <p>Calibrated altitude: { this.state.flight.altitude === undefined ? 'n/a' : this.state.flight.altitude + 'ft' }</p>
+                <p>Ground speed: { this.state.flight.speed === undefined ? 'n/a' : this.state.flight.speed + 'mph' }</p>
             </div>
         )
     }
