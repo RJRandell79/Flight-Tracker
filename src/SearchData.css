@@ -1,0 +1,12 @@
+.searchdata {
+    position: absolute;
+    right: 25px;
+    top: 25px;
+    width: 250px;
+    padding: 10px 15px;
+    background: #F2F2F2;
+    box-shadow: 3px 3px 5px rgba( 0, 50, 0, 0.33 );
+}
+.searchdata .completed {
+    margin: 0;
+}
