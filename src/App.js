@@ -5,6 +5,8 @@ import './App.css';
 import DeckGL, { IconLayer, TextLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import * as d3 from 'd3';
+import Papa from 'papaparse';
+import aircraftData from './data/aircraftDatabase.csv';
 import Base64 from 'base-64';
 import { CONFIG } from './config.js';
 
@@ -30,7 +32,8 @@ class App extends Component {
     state = {
         airplanes: [],
         flightinfo: [],
-        aircraft: []
+        aircraft: [],
+        datacount: 0
     };
     currentFrame = null;
     timer = null;
@@ -71,6 +74,24 @@ class App extends Component {
 
     convertToMPH = ( metrespersecond ) => {
         return Math.round( metrespersecond * 2.237 );
+    }
+
+    updateAircraft = ( result ) => {
+        this.setState({
+            aircraft: result.data,
+            datacount: result.data.length
+        });
+        console.log( 'Count: ' + this.state.datacount );
+    }
+
+    async fetchAircraftData() {
+        await fetch( aircraftData ).then( response => response.text() ).then( text => {
+            Papa.parse( text, {
+                worker: true,
+                header: true,
+                complete: this.updateAircraft
+            });
+        });
     }
 
     fetchData = () => {
@@ -185,13 +206,14 @@ class App extends Component {
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } />
+                <FlightData flight = { this.state.flightinfo } datalength = { this.state.datacount } />
             </div>
         );
     }
 
     componentDidMount() {
         this.fetchData();
+        this.fetchAircraftData();
     }
 
 }

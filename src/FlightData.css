@@ -9,7 +9,8 @@
     background: #F2F2F2;
     box-shadow: 3px 3px 5px rgba( 0, 50, 0, 0.33 );
 }
-.flightdata .airline {
+.flightdata .airline,
+.flightdata .count {
     font-size: 12px;
 }
 .flightdata .origindestination {

@@ -5,6 +5,7 @@ class FlightData extends Component {
 
     render() {
         const { callsign, altitude, velocity } = this.props.flight;
+        const datacount = this.props.datalength;
         return(
             <div className="flightdata">
                 <p>Flight Number: { callsign === undefined ? 'N/A' : callsign }</p>
@@ -19,6 +20,8 @@ class FlightData extends Component {
 
                 <p>Calibrated altitude: { altitude === undefined ? 'n/a' : altitude + 'ft' }</p>
                 <p>Ground speed: { velocity === undefined ? 'n/a' : velocity + 'mph' }</p>
+                <hr />
+                <p className="count">{ datacount === 0 ? 'Data loading...' : datacount + ' aircraft loaded.' }</p>
             </div>
         )
     }
