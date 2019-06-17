@@ -29,20 +29,21 @@ const initialViewState = {
 class App extends Component {
     state = {
         airplanes: [],
-        flightinfo: []
+        flightinfo: [],
+        aircraft: []
     };
     currentFrame = null;
     timer = null;
     fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
 
-    fetchFlightData = ( flight ) => {
+    fetchFlightData = ({ callsign, altitude, velocity }) => {
         this.setState({
-            flightinfo: [
-                flight.object.callsign,
-                flight.object.altitude,
-                flight.object.velocity
-            ]
+            flightinfo: {
+                callsign,
+                altitude,
+                velocity
+            }
         });
     }
 
@@ -109,7 +110,7 @@ class App extends Component {
                 id: 'airplanes',
                 data: this.state.airplanes,
                 pickable: true,
-                onClick: ( info, event ) => this.fetchFlightData( info ),
+                onClick: ( info, event ) => this.fetchFlightData( info.object ),
                 iconAtlas: Airplane,
                 iconMapping: {
                     airplane: {
