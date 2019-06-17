@@ -3,13 +3,13 @@
     position: absolute;
     left: 25px;
     bottom: 50px;
-    width: 350px;
-    height: 200px;
+    width: 250px;
     padding: 25px;
     background: #F2F2F2;
     box-shadow: 3px 3px 5px rgba( 0, 50, 0, 0.33 );
 }
 .flightdata .airline,
+.flightdata .model,
 .flightdata .count {
     font-size: 12px;
 }
@@ -26,4 +26,7 @@
 }
 .flightdata p {
     margin: 0 0 5px;
+}
+.flightdata p:last-of-type {
+    margin: 0;
 }

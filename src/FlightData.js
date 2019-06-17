@@ -4,12 +4,14 @@ import './FlightData.css';
 class FlightData extends Component {
 
     render() {
-        const { callsign, altitude, velocity } = this.props.flight;
+        const { callsign, airline, model, altitude, velocity } = this.props.flight;
         const datacount = this.props.datalength;
+
         return(
             <div className="flightdata">
                 <p>Flight Number: { callsign === undefined ? 'N/A' : callsign }</p>
-                <p className="airline">Airline: n/a</p>
+                <p className="airline">Airline: { airline === undefined ? 'N/A' : airline }</p>
+                <p className="model">Aircraft: { model === undefined ? 'N/A' : model }</p>
                 <hr />
 
                 <div className="origindestination">

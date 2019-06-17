@@ -6,11 +6,13 @@ import DeckGL, { IconLayer, TextLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import * as d3 from 'd3';
 import Papa from 'papaparse';
-import aircraftData from './data/aircraftDatabase.csv';
 import Base64 from 'base-64';
+
+import aircraftData from './data/aircraftDatabase.csv';
 import { CONFIG } from './config.js';
 
 import FlightData from './FlightData';
+import SearchData from './SearchData';
 
 import Airplane from './airplane-icon.png';
 import destinationPoint from './destinationPoint.js';
@@ -33,14 +35,18 @@ class App extends Component {
         airplanes: [],
         flightinfo: [],
         aircraft: [],
-        datacount: 0
+        datacount: 0,
+        isSearching: false,
+        percent: 0
     };
     currentFrame = null;
     timer = null;
     fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
 
-    fetchFlightData = ({ callsign, altitude, velocity }) => {
+    searchAircraftData = ({ icao, callsign, altitude, velocity }) => {
+        let airline, model = 'Not available';
+
         this.setState({
             flightinfo: {
                 callsign,
@@ -48,6 +54,33 @@ class App extends Component {
                 velocity
             }
         });
+
+        for( var a = 0; a < this.state.aircraft.length; a++ ) {
+
+            this.setState({
+                isSearching: true,
+                percent: Math.floor( ( a / this.state.aircraft.length ) * 100 )
+            });
+            console.log( this.state.isSearching + ', ' + this.state.percent + '% complete' );
+
+            if( this.state.aircraft[ a ][ 'icao24' ] === icao ) {
+                airline = this.state.aircraft[ a ][ 'owner' ];
+                model = this.state.aircraft[ a ][ 'model' ];
+
+                this.setState({
+                    flightinfo: {
+                        callsign,
+                        airline,
+                        model,
+                        altitude,
+                        velocity
+                    },
+                    isSearching: false,
+                    percent: 0
+                });
+                break;
+            }
+        }
     }
 
     animationFrame = () => {
@@ -81,7 +114,6 @@ class App extends Component {
             aircraft: result.data,
             datacount: result.data.length
         });
-        console.log( 'Count: ' + this.state.datacount );
     }
 
     async fetchAircraftData() {
@@ -131,7 +163,7 @@ class App extends Component {
                 id: 'airplanes',
                 data: this.state.airplanes,
                 pickable: true,
-                onClick: ( info, event ) => this.fetchFlightData( info.object ),
+                onClick: ( info, event ) => this.searchAircraftData( info.object ),
                 iconAtlas: Airplane,
                 iconMapping: {
                     airplane: {
@@ -207,6 +239,7 @@ class App extends Component {
                 </DeckGL>
 
                 <FlightData flight = { this.state.flightinfo } datalength = { this.state.datacount } />
+                <SearchData searchPercentage = { this.state.percent } />
             </div>
         );
     }
