@@ -35,9 +35,7 @@ class App extends Component {
         airplanes: [],
         flightinfo: [],
         aircraft: [],
-        datacount: 0,
         isSearching: false,
-        percent: 0
     };
     currentFrame = null;
     timer = null;
@@ -45,42 +43,35 @@ class App extends Component {
     framesPerFetch = this.fetchEverySeconds * 30;
 
     searchAircraftData = ({ icao, callsign, altitude, velocity }) => {
-        let airline, model = 'Not available';
 
         this.setState({
             flightinfo: {
                 callsign,
                 altitude,
                 velocity
-            }
+            },
+            isSearching: true
         });
 
-        for( var a = 0; a < this.state.aircraft.length; a++ ) {
+        let data = { icao: icao }
 
+        fetch( 'http://dev.heckfordclients.co.uk/flighttracker/search.php', {
+            method: 'POST',
+            body: JSON.stringify( data )
+        }).then( ( response ) => {
+            return response.json()
+        }).then( ( json ) => {
             this.setState({
-                isSearching: true,
-                percent: Math.floor( ( a / this.state.aircraft.length ) * 100 )
-            });
-            console.log( this.state.isSearching + ', ' + this.state.percent + '% complete' );
-
-            if( this.state.aircraft[ a ][ 'icao24' ] === icao ) {
-                airline = this.state.aircraft[ a ][ 'owner' ];
-                model = this.state.aircraft[ a ][ 'model' ];
-
-                this.setState({
-                    flightinfo: {
-                        callsign,
-                        airline,
-                        model,
-                        altitude,
-                        velocity
-                    },
-                    isSearching: false,
-                    percent: 0
-                });
-                break;
-            }
-        }
+                flightinfo: {
+                    callsign,
+                    altitude,
+                    velocity,
+                    airline: json[ 'found' ][ 13 ],
+                    model: json[ 'found' ][ 4 ]
+                },
+                isSearching: false
+            })
+        })
     }
 
     animationFrame = () => {
@@ -111,8 +102,7 @@ class App extends Component {
 
     updateAircraft = ( result ) => {
         this.setState({
-            aircraft: result.data,
-            datacount: result.data.length
+            aircraft: result.data
         });
     }
 
@@ -238,7 +228,7 @@ class App extends Component {
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } datalength = { this.state.datacount } />
+                <FlightData flight = { this.state.flightinfo } searching = { this.state.isSearching } />
                 <SearchData searchPercentage = { this.state.percent } />
             </div>
         );
@@ -246,7 +236,6 @@ class App extends Component {
 
     componentDidMount() {
         this.fetchData();
-        this.fetchAircraftData();
     }
 
 }
