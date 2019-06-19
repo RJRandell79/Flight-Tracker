@@ -5,10 +5,8 @@ import './App.css';
 import DeckGL, { IconLayer, TextLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import * as d3 from 'd3';
-import Papa from 'papaparse';
 import Base64 from 'base-64';
 
-import aircraftData from './data/aircraftDatabase.csv';
 import { CONFIG } from './config.js';
 
 import FlightData from './FlightData';
@@ -98,6 +96,9 @@ class App extends Component {
     convertToMPH = ( metrespersecond ) => {
         return Math.round( metrespersecond * 2.237 );
     }
+    convertoFeet = ( metres ) => {
+        return Math.round( metres * 3.281 );
+    }
 
     fetchData = () => {
         d3.json( 'https://opensky-network.org/api/states/all?lamin=49.9289&lomin=-7.5062&lamax=58.589&lomax=1.6226', {
@@ -115,7 +116,7 @@ class App extends Component {
                     velocity: this.convertToMPH( d[ 9 ] ),
                     origin_country: d[ 2 ],
                     true_track: Math.round( d[ 10 ] ),
-                    altitude: Math.round( d[ 7 ] ),
+                    altitude: this.convertoFeet( d[ 7 ] ),
                     interpolatePos: d3.geoInterpolate(
                         [ d[ 5 ], d[ 6 ] ],
                         destinationPoint( d[ 5 ], d[ 6 ], d[ 9 ] * this.fetchEverySeconds, d[ 10 ] )
