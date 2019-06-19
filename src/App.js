@@ -12,7 +12,6 @@ import aircraftData from './data/aircraftDatabase.csv';
 import { CONFIG } from './config.js';
 
 import FlightData from './FlightData';
-import SearchData from './SearchData';
 
 import Airplane from './airplane-icon.png';
 import destinationPoint from './destinationPoint.js';
@@ -98,22 +97,6 @@ class App extends Component {
 
     convertToMPH = ( metrespersecond ) => {
         return Math.round( metrespersecond * 2.237 );
-    }
-
-    updateAircraft = ( result ) => {
-        this.setState({
-            aircraft: result.data
-        });
-    }
-
-    async fetchAircraftData() {
-        await fetch( aircraftData ).then( response => response.text() ).then( text => {
-            Papa.parse( text, {
-                worker: true,
-                header: true,
-                complete: this.updateAircraft
-            });
-        });
     }
 
     fetchData = () => {
@@ -229,7 +212,6 @@ class App extends Component {
                 </DeckGL>
 
                 <FlightData flight = { this.state.flightinfo } searching = { this.state.isSearching } />
-                <SearchData searchPercentage = { this.state.percent } />
             </div>
         );
     }
