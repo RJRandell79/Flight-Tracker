@@ -58,17 +58,21 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            this.setState({
-                flightinfo: {
-                    callsign,
-                    altitude,
-                    velocity,
-                    airline: json[ 'found' ][ 13 ],
-                    model: json[ 'found' ][ 4 ]
-                },
-                isSearching: false
-            })
-        })
+            if( json[ 'found' ][ 13 ] !== '' && json[ 'found' ][ 4 ] !== '' ) {
+                this.setState({
+                    flightinfo: {
+                        callsign,
+                        altitude,
+                        velocity,
+                        airline: json[ 'found' ][ 13 ],
+                        model: json[ 'found' ][ 4 ]
+                    },
+                    isSearching: false
+                })
+            } else {
+                alert( 'Flight information not found' );
+            }
+        });
     }
 
     animationFrame = () => {
@@ -93,6 +97,14 @@ class App extends Component {
         this.timer = d3.timer( this.animationFrame );
     };
 
+    validateCallsign = ( callsign ) => {
+        if( callsign === '' || callsign === undefined ) {
+            return 'FLIGHT NO. NOT AVAILABLE'
+        } else {
+            return callsign;
+        }
+    }
+
     convertToMPH = ( metrespersecond ) => {
         return Math.round( metrespersecond * 2.237 );
     }
@@ -109,7 +121,7 @@ class App extends Component {
             ({ states }) => this.setState({
                 airplanes: states.map( d => ({
                     icao: d[ 0 ],
-                    callsign: d[ 1 ],
+                    callsign: this.validateCallsign( d[ 1 ] ),
                     last_contact: d[ 4 ],
                     longitude: d[ 5 ],
                     latitude: d[ 6 ],
