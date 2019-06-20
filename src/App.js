@@ -31,7 +31,8 @@ class App extends Component {
         airplanes: [],
         flightinfo: [],
         aircraft: [],
-        isSearching: false,
+        isSearchingAir: false,
+        isSearchingRoute: false
     };
     currentFrame = null;
     timer = null;
@@ -40,7 +41,7 @@ class App extends Component {
 
     getFlightRoute = ( callsign ) => {
         this.setState({
-            isSearching: true
+            isSearchingRoute: true
         });
 
         let data = { call: callsign }
@@ -52,7 +53,7 @@ class App extends Component {
             return response.json()
         }).then( ( json ) => {
             this.setState({
-                isSearching: false
+                isSearchingRoute: false
             });
             console.log( json[ 'route found' ][ 1 ] )
         });
@@ -66,7 +67,7 @@ class App extends Component {
                 altitude,
                 velocity
             },
-            isSearching: true
+            isSearchingAir: true
         });
 
         let data = { icao: icao }
@@ -86,7 +87,7 @@ class App extends Component {
                         airline: json[ 'found' ][ 13 ],
                         model: json[ 'found' ][ 4 ]
                     },
-                    isSearching: false
+                    isSearchingAir: false
                 });
             } else {
                 alert( 'Flight information not found' );
@@ -245,7 +246,7 @@ class App extends Component {
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searching = { this.state.isSearching } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } />
             </div>
         );
     }

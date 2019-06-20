@@ -5,7 +5,8 @@ class FlightData extends Component {
 
     render() {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
-        const searchingData = this.props.searching;
+        const searchingData = this.props.searchingair;
+        const searchingRoute = this.props.searchingroute;
 
         return(
             <div className="flightdata">
@@ -23,7 +24,8 @@ class FlightData extends Component {
                 <p>Calibrated altitude: { altitude === undefined ? 'n/a' : altitude + 'ft' }</p>
                 <p>Ground speed: { velocity === undefined ? 'n/a' : velocity + 'mph' }</p>
                 <hr />
-                { searchingData ? <p className="count">Searching...</p> : null }
+                { searchingData ? <p className="count">Searching airlines/aircraft...</p> : null }
+                { searchingRoute ? <p className="count">Searching route...</p> : null }
             </div>
         )
     }

@@ -27,6 +27,6 @@
 .flightdata p {
     margin: 0 0 5px;
 }
-.flightdata p:last-of-type {
+.flightdata .count {
     margin: 0;
 }
