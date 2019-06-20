@@ -6,7 +6,6 @@ import DeckGL, { IconLayer, TextLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import * as d3 from 'd3';
 import Base64 from 'base-64';
-
 import { CONFIG } from './config.js';
 
 import FlightData from './FlightData';
@@ -39,6 +38,26 @@ class App extends Component {
     fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
 
+    getFlightRoute = ( callsign ) => {
+        this.setState({
+            isSearching: true
+        });
+
+        let data = { call: callsign }
+
+        fetch( 'http://dev.heckfordclients.co.uk/flighttracker/routes.php', {
+            method: 'POST',
+            body: JSON.stringify( data )
+        }).then( ( response ) => {
+            return response.json()
+        }).then( ( json ) => {
+            this.setState({
+                isSearching: false
+            });
+            console.log( json[ 'route found' ][ 1 ] )
+        });
+    }
+
     searchAircraftData = ({ icao, callsign, altitude, velocity }) => {
 
         this.setState({
@@ -58,7 +77,7 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            if( json[ 'found' ][ 13 ] !== '' && json[ 'found' ][ 4 ] !== '' ) {
+            if( json[ 'found' ][ 4 ] !== '' && json[ 'found' ][ 13 ] !== '' ) {
                 this.setState({
                     flightinfo: {
                         callsign,
@@ -68,11 +87,13 @@ class App extends Component {
                         model: json[ 'found' ][ 4 ]
                     },
                     isSearching: false
-                })
+                });
             } else {
                 alert( 'Flight information not found' );
             }
         });
+
+        this.getFlightRoute( callsign );
     }
 
     animationFrame = () => {
@@ -99,7 +120,7 @@ class App extends Component {
 
     validateCallsign = ( callsign ) => {
         if( callsign === '' || callsign === undefined ) {
-            return 'FLIGHT NO. NOT AVAILABLE'
+            return 'FLIGHT NO. NOT AVAILABLE';
         } else {
             return callsign;
         }
