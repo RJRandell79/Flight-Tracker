@@ -25,6 +25,16 @@
     float: right;
     text-align: right;
 }
+.flightdata .graph {
+    width: 100%;
+    height: 3px;
+    background: #D7D7D7;
+}
+.flightdata .graph .distance {
+    display: inherit;
+    height: 3px;
+    background: #FFFB00;
+}
 .flightdata p {
     margin: 0 0 5px;
 }

@@ -9,6 +9,7 @@ class FlightData extends Component {
         const searchingRoute = this.props.searchingroute;
         const origin = this.props.origin;
         const destination = this.props.destination;
+        const widthPercentage = this.props.widthpercentage;
 
         return(
             <div className="flightdata">
@@ -20,6 +21,9 @@ class FlightData extends Component {
                 <div className="origindestination">
                     <p>From: { ( origin === undefined || origin === '' ) ? 'N/A' : origin }</p>
                     <p>To: { ( destination === undefined || destination === '' ) ? 'N/A' : destination }</p>
+                </div>
+                <div className="graph">
+                    <span className="distance" style={{ width: widthPercentage + '%' }}></span>
                 </div>
                 <hr />
 

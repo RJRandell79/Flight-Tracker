@@ -33,6 +33,7 @@ class App extends Component {
         aircraft: [],
         origin: null,
         destination: null,
+        distance: 0,
         isSearchingAir: false,
         isSearchingRoute: false
     };
@@ -76,7 +77,9 @@ class App extends Component {
         let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
         let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
 
-        console.log( distanceBetweenPorts + ', ' + distanceToGo );
+        this.setState({
+            distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) )
+        });
     }
 
     getFlightRoute = ( callsign, latitude, longitude ) => {
@@ -302,7 +305,7 @@ class App extends Component {
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } />
             </div>
         );
     }
