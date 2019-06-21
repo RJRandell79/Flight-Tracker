@@ -19,6 +19,7 @@
 .flightdata .origindestination p {
     float: left;
     width: 50%;
+    font-size: 12px;
 }
 .flightdata .origindestination p:last-of-type {
     float: right;

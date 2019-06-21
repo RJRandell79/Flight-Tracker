@@ -31,6 +31,8 @@ class App extends Component {
         airplanes: [],
         flightinfo: [],
         aircraft: [],
+        origin: null,
+        destination: null,
         isSearchingAir: false,
         isSearchingRoute: false
     };
@@ -52,11 +54,26 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
+            this.searchAirports( json[ 'route found' ][ 1 ] );
+        });
+    }
+
+    searchAirports = ( str ) => {
+        let airports = str.split( '-' );
+        let data = { origin: airports[ 0 ], dest: airports[ 1 ] }
+
+        fetch( 'http://dev.heckfordclients.co.uk/flighttracker/airports.php', {
+            method: 'POST',
+            body: JSON.stringify( data )
+        }).then( ( response ) => {
+            return response.json()
+        }).then( ( json ) => {
             this.setState({
+                origin: json[ 'org' ][ 1 ],
+                destination: json[ 'dest' ][ 1 ],
                 isSearchingRoute: false
             });
-            console.log( json[ 'route found' ][ 1 ] )
-        });
+        })
     }
 
     searchAircraftData = ({ icao, callsign, altitude, velocity }) => {
@@ -246,7 +263,7 @@ class App extends Component {
                     <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } />
             </div>
         );
     }

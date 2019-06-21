@@ -16,7 +16,7 @@
         fclose( $fp );
         echo json_encode( array( 'found' => 'No matches' ) );
     else :
-        echo json_encode( array( 'found' => 'File failed to open' ) );
+        echo json_encode( array( 'error' => 'File failed to open' ) );
     endif;
 
 ?>

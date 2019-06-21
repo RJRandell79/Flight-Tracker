@@ -16,6 +16,6 @@
         fclose( $fp );
         echo json_encode( array( 'route found' => 'No matches' ) );
     else :
-        echo json_encode( array( 'route found' => 'File failed to open' ) );
+        echo json_encode( array( 'error' => 'File failed to open' ) );
     endif;
 ?>

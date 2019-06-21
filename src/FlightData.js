@@ -7,6 +7,8 @@ class FlightData extends Component {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
         const searchingData = this.props.searchingair;
         const searchingRoute = this.props.searchingroute;
+        const origin = this.props.origin;
+        const destination = this.props.destination;
 
         return(
             <div className="flightdata">
@@ -16,8 +18,8 @@ class FlightData extends Component {
                 <hr />
 
                 <div className="origindestination">
-                    <p>From: n/a</p>
-                    <p>To: n/a</p>
+                    <p>From: { ( origin === undefined || origin === '' ) ? 'N/A' : origin }</p>
+                    <p>To: { ( destination === undefined || destination === '' ) ? 'N/A' : destination }</p>
                 </div>
                 <hr />
 
