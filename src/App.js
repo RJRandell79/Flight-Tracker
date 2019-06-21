@@ -36,12 +36,50 @@ class App extends Component {
         isSearchingAir: false,
         isSearchingRoute: false
     };
+    radius = 6371;
     currentFrame = null;
     timer = null;
     fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
 
-    getFlightRoute = ( callsign ) => {
+    distanceBetweenAirports = ( lat1, lon1, lat2, lon2 ) => {
+        let dlat = ( lat2 - lat1 ) * Math.PI / 180;
+        let dlon = ( lon2 - lon1 ) * Math.PI / 180;
+
+        let a = Math.sin( dlat / 2 ) * Math.sin( dlat / 2 ) + Math.cos( lat1 * Math.PI / 180 ) * Math.cos( lat2 * Math.PI / 180 ) * Math.sin( dlon / 2 ) * Math.sin( dlon / 2 );
+        let c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
+        let d = this.radius * c;
+
+        return Math.round( d );
+    }
+
+    distanceToGo = ( lat1, lon1, planelat1, planelon1 ) => {
+        let dlat = ( lat1 - planelat1 ) * Math.PI / 180;
+        let dlon = ( lon1 - planelon1 ) * Math.PI / 180;
+
+        let a = Math.sin( dlat / 2 ) * Math.sin( dlat / 2 ) + Math.cos( lat1 * Math.PI / 180 ) * Math.cos( planelat1 * Math.PI / 180 ) * Math.sin( dlon / 2 ) * Math.sin( dlon / 2 );
+        let c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
+        let d = this.radius * c;
+
+        return Math.round( d );
+    }
+
+    calcDistances = ( airportlocations, aircraftposition ) => {
+        let lat1 = airportlocations.dest.destlat;
+        let lat2 = airportlocations.org.orglat;
+        let lon1 = airportlocations.dest.destlng;
+        let lon2 = airportlocations.org.orglng;
+
+        let planelat1 = aircraftposition.plane.lat;
+        let planelon1 = aircraftposition.plane.lng;
+
+        let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
+        let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
+
+        console.log( distanceBetweenPorts + ', ' + distanceToGo );
+    }
+
+    getFlightRoute = ( callsign, latitude, longitude ) => {
         this.setState({
             isSearchingRoute: true
         });
@@ -54,11 +92,11 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            this.searchAirports( json[ 'route found' ][ 1 ] );
+            this.searchAirports( json[ 'route found' ][ 1 ], latitude, longitude );
         });
     }
 
-    searchAirports = ( str ) => {
+    searchAirports = ( str, latitude, longitude ) => {
         let airports = str.split( '-' );
         let data = { origin: airports[ 0 ], dest: airports[ 1 ] }
 
@@ -73,10 +111,11 @@ class App extends Component {
                 destination: json[ 'dest' ][ 1 ],
                 isSearchingRoute: false
             });
+            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ] } }, { plane: { lat: latitude, lng: longitude } } );
         })
     }
 
-    searchAircraftData = ({ icao, callsign, altitude, velocity }) => {
+    searchAircraftData = ({ icao, callsign, altitude, velocity, latitude, longitude }) => {
 
         this.setState({
             flightinfo: {
@@ -111,7 +150,7 @@ class App extends Component {
             }
         });
 
-        this.getFlightRoute( callsign );
+        this.getFlightRoute( callsign, latitude, longitude );
     }
 
     animationFrame = () => {
