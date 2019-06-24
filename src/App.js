@@ -2,7 +2,8 @@
 
 import React, { Component } from 'react';
 import './App.css';
-import DeckGL, { IconLayer, TextLayer } from 'deck.gl';
+import DeckGL, { IconLayer, TextLayer, LineLayer } from 'deck.gl';
+import { MapboxLayer } from '@deck.gl/mapbox';
 import { StaticMap } from 'react-map-gl';
 import * as d3 from 'd3';
 import Base64 from 'base-64';
@@ -32,16 +33,47 @@ class App extends Component {
         flightinfo: [],
         aircraft: [],
         origin: null,
+        origingps: null,
         destination: null,
+        destinationgps: null,
         distance: 0,
+        milesToGo: 0,
         isSearchingAir: false,
         isSearchingRoute: false
     };
-    radius = 6371;
+    map = null;
+    radius = 3959; //miles
     currentFrame = null;
     timer = null;
     fetchEverySeconds = 6;
     framesPerFetch = this.fetchEverySeconds * 30;
+
+    _onMapLoad = () => {
+        this.map = this._map;
+
+        /*
+        const myCircleLayer = new MapboxLayer({
+            id: 'my-scatterplot',
+            type: ScatterplotLayer,
+            data: [
+                { position: [ -2.2936, 54.496953 ], size: 7000 }
+            ],
+            getPosition: d => d.position,
+            getRadius: d => d.size,
+            getColor: [ 0, 255, 0 ]
+        })
+
+        this.map.addLayer( myCircleLayer );
+
+        myCircleLayer.setProps({
+            getColor: [ 0, 0, 255 ]
+        })
+        */
+    }
+
+    _onWebGLInitialized = ( gl ) => {
+        this.setState({ gl });
+    }
 
     distanceBetweenAirports = ( lat1, lon1, lat2, lon2 ) => {
         let dlat = ( lat2 - lat1 ) * Math.PI / 180;
@@ -78,7 +110,8 @@ class App extends Component {
         let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
 
         this.setState({
-            distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) )
+            distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) ),
+            milesToGo: Math.round( distanceToGo )
         });
     }
 
@@ -100,8 +133,19 @@ class App extends Component {
     }
 
     searchAirports = ( str, latitude, longitude ) => {
+
         let airports = str.split( '-' );
         let data = { origin: airports[ 0 ], dest: airports[ 1 ] }
+
+        let doneRoute = this.map.getLayer( 'flightpathdone' );
+        let togoRoute = this.map.getLayer( 'flightpathtogo' );
+
+        if( typeof togoRoute !== 'undefined' ) {
+            this.map.removeLayer( 'flightpathtogo' );
+        }
+        if( typeof doneRoute !== 'undefined' ) {
+            this.map.removeLayer( 'flightpathdone' );
+        }
 
         fetch( 'http://dev.heckfordclients.co.uk/flighttracker/airports.php', {
             method: 'POST',
@@ -111,11 +155,49 @@ class App extends Component {
         }).then( ( json ) => {
             this.setState({
                 origin: json[ 'org' ][ 1 ],
+                origingps: [ json[ 'org' ][ 6 ], json[ 'org' ][ 7 ] ],
                 destination: json[ 'dest' ][ 1 ],
+                destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
                 isSearchingRoute: false
             });
             this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ] } }, { plane: { lat: latitude, lng: longitude } } );
-        })
+
+            const flightpathToGo = new MapboxLayer({
+                id: 'flightpathtogo',
+                type: LineLayer,
+                data: [{
+                    from: { position: [ longitude, latitude ] },
+                    to: { position: [ +json[ 'dest' ][ 7 ], +json[ 'dest' ][ 6 ] ] }
+                }],
+                getSourcePosition: d => d.from.position,
+                getTargetPosition: d => d.to.position,
+                getWidth: 2,
+                getColor: [ 0, 255, 0 ]
+            });
+
+            const flightpathDone = new MapboxLayer({
+                id: 'flightpathdone',
+                type: LineLayer,
+                data: [{
+                    from: { position: [ +json[ 'org' ][ 7 ], +json[ 'org' ][ 6 ] ] },
+                    to: { position: [ longitude, latitude ] }
+                }],
+                getSourcePosition: d => d.from.position,
+                getTargetPosition: d => d.to.position,
+                getWidth: 2,
+                getColor: [ 0, 255, 0 ]
+            });
+
+            this.map.addLayer( flightpathToGo );
+            this.map.addLayer( flightpathDone );
+
+            flightpathToGo.setProps({
+                getColor: [ 0, 0, 255 ]
+            });
+            flightpathDone.setProps({
+                getColor: [ 255, 0, 0 ]
+            })
+        });
     }
 
     searchAircraftData = ({ icao, callsign, altitude, velocity, latitude, longitude }) => {
@@ -225,6 +307,7 @@ class App extends Component {
     };
 
     render() {
+        const { gl } = this.state;
         const layers = [
             new IconLayer({
                 id: 'airplanes',
@@ -301,11 +384,13 @@ class App extends Component {
 
         return(
             <div className="flights-container">
-                <DeckGL initialViewState = { initialViewState } controller = { true } layers = { layers } onClick={ this._onClick }>
-                    <StaticMap mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } />
+                <DeckGL ref = { ref => { this._deck = ref && ref.deck } } initialViewState = { initialViewState } controller = { true } layers = { layers } onClick={ this._onClick } onWebGLInitialized = { this._onWebGLInitialized }>
+                { gl && (
+                    <StaticMap ref = { ref => { this._map = ref && ref.getMap(); } } mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } onLoad = { this._onMapLoad } />
+                )}
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } mileage = { this.state.milesToGo } />
             </div>
         );
     }
