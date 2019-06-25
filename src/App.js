@@ -80,7 +80,7 @@ class App extends Component {
         return Math.round( d );
     }
 
-    timeOfArrival = ( hours, minutes, timedifference ) => {
+    timeOfArrival = ( hours, minutes, timedifference, timezone ) => {
         let hoursMs = hours * 3.6e+6;
         let minutesMs = minutes * 60000;
         let timeLeft = hoursMs + minutesMs;
@@ -127,7 +127,7 @@ class App extends Component {
             default : dateSuffix = 'th';
         }
 
-        return day + ' ' + arrivalDate + dateSuffix + ', ' + arrivalHour + ':' + arrivalMinutes;
+        return day + ' ' + arrivalDate + dateSuffix + ', ' + arrivalHour + ':' + arrivalMinutes + ' (' + timezone + ')';
     }
 
     flightTimeRemaining = ( remainingDistance, velocity ) => {
@@ -152,11 +152,12 @@ class App extends Component {
         let planespeed = aircraftposition.plane.speed;
 
         let timedifference = airportlocations.dest.timedifference;
+        let timezone = airportlocations.dest.timezone;
 
         let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
         let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
         let hoursToGo = this.flightTimeRemaining( distanceToGo, planespeed );
-        let eta = this.timeOfArrival( hoursToGo[ 0 ], hoursToGo[ 1 ], timedifference );
+        let eta = this.timeOfArrival( hoursToGo[ 0 ], hoursToGo[ 1 ], timedifference, timezone );
 
         this.setState({
             distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) ),
@@ -211,7 +212,7 @@ class App extends Component {
                 destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
                 isSearchingRoute: false
             });
-            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timedifference: json[ 'dest' ][ 9 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
+            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timedifference: json[ 'dest' ][ 9 ], timezone: json[ 'dest' ][ 11 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
 
             const flightpathToGo = new MapboxLayer({
                 id: 'flightpathtogo',
