@@ -12,6 +12,7 @@ class FlightData extends Component {
         const widthPercentage = this.props.widthpercentage;
         const milesToGo = this.props.mileage;
         const hoursToGo = this.props.hourstogo;
+        const timeOfArrival = this.props.eta;
 
         return(
             <div className="flightdata">
@@ -30,6 +31,7 @@ class FlightData extends Component {
                 <div className="destination">
                     <p className="miles">Distance left: { ( milesToGo === undefined || milesToGo === 0 ) ? 'N/A' : milesToGo + ' miles' } </p>
                     <p>Flight time remaining: { ( hoursToGo === undefined || hoursToGo === 0 ? 'N/A' : hoursToGo ) }</p>
+                    <p>ETA (local time): { ( timeOfArrival === undefined || timeOfArrival === '' ? 'N/A' : timeOfArrival ) }</p>
                 </div>
                 <hr />
 

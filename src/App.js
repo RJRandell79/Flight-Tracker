@@ -39,6 +39,7 @@ class App extends Component {
         distance: 0,
         milesToGo: 0,
         hoursToGo: 0,
+        timeOfArrival: '',
         isSearchingAir: false,
         isSearchingRoute: false
     };
@@ -79,7 +80,57 @@ class App extends Component {
         return Math.round( d );
     }
 
-    timeOfArrival = ( remainingDistance, velocity, timezone ) => {
+    timeOfArrival = ( hours, minutes, timedifference ) => {
+        let hoursMs = hours * 3.6e+6;
+        let minutesMs = minutes * 60000;
+        let timeLeft = hoursMs + minutesMs;
+
+        let date = new Date();
+        let timenow = date.getTime();
+
+        let milliseconds = Math.abs( 3.6e+6 * timedifference );
+        let arrivaltime = 0;
+
+        if( parseInt( timedifference ) < 0 ) {
+            arrivaltime = timeLeft + ( timenow - milliseconds );
+        } else {
+            arrivaltime = timeLeft + ( timenow + milliseconds );
+        }
+
+        let arriving = new Date( arrivaltime );
+        let arrivalDay = arriving.getDay();
+        let arrivalDate = arriving.getDate();
+        let arrivalHour = arriving.getHours();
+        let arrivalMinutes = arriving.getMinutes();
+
+        let day, dateSuffix = '';
+
+        switch( arrivalDay ) {
+            case 0 : day = 'Sunday'; break;
+            case 1 : day = 'Monday'; break;
+            case 2 : day = 'Tuesday'; break;
+            case 3 : day = 'Wednesday'; break;
+            case 4 : day = 'Thursday'; break;
+            case 5 : day = 'Friday'; break;
+            case 6 : day = 'Saturday'; break;
+            default: day = '';
+        }
+
+        switch( arrivalDate ) {
+            case '1' :
+            case '21' :
+            case '31' : dateSuffix = 'st'; break;
+            case '2' :
+            case '22' : dateSuffix = 'nd'; break;
+            case '3' :
+            case '23' : dateSuffix = 'rd'; break;
+            default : dateSuffix = 'th';
+        }
+
+        return day + ' ' + arrivalDate + dateSuffix + ', ' + arrivalHour + ':' + arrivalMinutes;
+    }
+
+    flightTimeRemaining = ( remainingDistance, velocity ) => {
         let time = remainingDistance / velocity;
         let radixPos = String( time ).indexOf( '.' );
         let decimalvalue = String( time ).slice( radixPos );
@@ -87,7 +138,7 @@ class App extends Component {
         let hours = Math.floor( time );
         let minutes = Math.round( decimalvalue * 60 );
 
-        return hours + ' hrs, ' + minutes + ' mins';
+        return [ hours, minutes ];
     }
 
     calcDistances = ( airportlocations, aircraftposition ) => {
@@ -100,16 +151,18 @@ class App extends Component {
         let planelon1 = aircraftposition.plane.lng;
         let planespeed = aircraftposition.plane.speed;
 
-        let timezone = airportlocations.dest.timezone;
+        let timedifference = airportlocations.dest.timedifference;
 
         let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
         let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
-        let hoursToGo = this.timeOfArrival( distanceToGo, planespeed, timezone );
+        let hoursToGo = this.flightTimeRemaining( distanceToGo, planespeed );
+        let eta = this.timeOfArrival( hoursToGo[ 0 ], hoursToGo[ 1 ], timedifference );
 
         this.setState({
             distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) ),
             milesToGo: Math.round( distanceToGo ),
-            hoursToGo: hoursToGo
+            hoursToGo: hoursToGo[ 0 ] + ' hrs, ' + hoursToGo[ 1 ] + ' mins',
+            timeOfArrival: eta
         });
     }
 
@@ -158,7 +211,7 @@ class App extends Component {
                 destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
                 isSearchingRoute: false
             });
-            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timezone: json[ 'dest' ][ 9 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
+            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timedifference: json[ 'dest' ][ 9 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
 
             const flightpathToGo = new MapboxLayer({
                 id: 'flightpathtogo',
@@ -388,7 +441,7 @@ class App extends Component {
                 )}
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } mileage = { this.state.milesToGo } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } eta = { this.state.timeOfArrival } mileage = { this.state.milesToGo } />
             </div>
         );
     }
