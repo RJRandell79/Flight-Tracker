@@ -48,7 +48,6 @@ class App extends Component {
         isSearchingRoute: false
     };
     map = null;
-    radius = 3959; //miles
     currentFrame = null;
     timer = null;
     fetchEverySeconds = 6;
