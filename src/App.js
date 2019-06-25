@@ -38,6 +38,7 @@ class App extends Component {
         destinationgps: null,
         distance: 0,
         milesToGo: 0,
+        hoursToGo: 0,
         isSearchingAir: false,
         isSearchingRoute: false
     };
@@ -50,25 +51,6 @@ class App extends Component {
 
     _onMapLoad = () => {
         this.map = this._map;
-
-        /*
-        const myCircleLayer = new MapboxLayer({
-            id: 'my-scatterplot',
-            type: ScatterplotLayer,
-            data: [
-                { position: [ -2.2936, 54.496953 ], size: 7000 }
-            ],
-            getPosition: d => d.position,
-            getRadius: d => d.size,
-            getColor: [ 0, 255, 0 ]
-        })
-
-        this.map.addLayer( myCircleLayer );
-
-        myCircleLayer.setProps({
-            getColor: [ 0, 0, 255 ]
-        })
-        */
     }
 
     _onWebGLInitialized = ( gl ) => {
@@ -97,6 +79,17 @@ class App extends Component {
         return Math.round( d );
     }
 
+    timeOfArrival = ( remainingDistance, velocity, timezone ) => {
+        let time = remainingDistance / velocity;
+        let radixPos = String( time ).indexOf( '.' );
+        let decimalvalue = String( time ).slice( radixPos );
+
+        let hours = Math.floor( time );
+        let minutes = Math.round( decimalvalue * 60 );
+
+        return hours + ' hrs, ' + minutes + ' mins';
+    }
+
     calcDistances = ( airportlocations, aircraftposition ) => {
         let lat1 = airportlocations.dest.destlat;
         let lat2 = airportlocations.org.orglat;
@@ -105,17 +98,22 @@ class App extends Component {
 
         let planelat1 = aircraftposition.plane.lat;
         let planelon1 = aircraftposition.plane.lng;
+        let planespeed = aircraftposition.plane.speed;
+
+        let timezone = airportlocations.dest.timezone;
 
         let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
         let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
+        let hoursToGo = this.timeOfArrival( distanceToGo, planespeed, timezone );
 
         this.setState({
             distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) ),
-            milesToGo: Math.round( distanceToGo )
+            milesToGo: Math.round( distanceToGo ),
+            hoursToGo: hoursToGo
         });
     }
 
-    getFlightRoute = ( callsign, latitude, longitude ) => {
+    getFlightRoute = ( callsign, latitude, longitude, velocity ) => {
         this.setState({
             isSearchingRoute: true
         });
@@ -128,11 +126,11 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            this.searchAirports( json[ 'route found' ][ 1 ], latitude, longitude );
+            this.searchAirports( json[ 'route found' ][ 1 ], latitude, longitude, velocity );
         });
     }
 
-    searchAirports = ( str, latitude, longitude ) => {
+    searchAirports = ( str, latitude, longitude, velocity ) => {
 
         let airports = str.split( '-' );
         let data = { origin: airports[ 0 ], dest: airports[ 1 ] }
@@ -160,7 +158,7 @@ class App extends Component {
                 destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
                 isSearchingRoute: false
             });
-            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ] } }, { plane: { lat: latitude, lng: longitude } } );
+            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timezone: json[ 'dest' ][ 9 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
 
             const flightpathToGo = new MapboxLayer({
                 id: 'flightpathtogo',
@@ -235,7 +233,7 @@ class App extends Component {
             }
         });
 
-        this.getFlightRoute( callsign, latitude, longitude );
+        this.getFlightRoute( callsign, latitude, longitude, velocity );
     }
 
     animationFrame = () => {
@@ -390,7 +388,7 @@ class App extends Component {
                 )}
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } mileage = { this.state.milesToGo } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } mileage = { this.state.milesToGo } />
             </div>
         );
     }
