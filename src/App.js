@@ -13,6 +13,10 @@ import FlightData from './FlightData';
 
 import Airplane from './airplane-icon.png';
 import destinationPoint from './destinationPoint.js';
+import timeOfArrivalFunc from './timeOfArrival.js';
+import distanceToGoFunc from './distanceToGo.js';
+import distanceBetweenAirportsFunc from './distanceBetweenAirports.js';
+import flightTimeRemainingFunc from './flightTimeRemaining.js';
 
 const MAPBOX_ACCESS_TOKEN = CONFIG.mapboxapikey;
 const MAPBOX_STYLE = "mapbox://styles/robrandell/cj9jtcr56024l2rrxpdxuxmnf";
@@ -58,89 +62,6 @@ class App extends Component {
         this.setState({ gl });
     }
 
-    distanceBetweenAirports = ( lat1, lon1, lat2, lon2 ) => {
-        let dlat = ( lat2 - lat1 ) * Math.PI / 180;
-        let dlon = ( lon2 - lon1 ) * Math.PI / 180;
-
-        let a = Math.sin( dlat / 2 ) * Math.sin( dlat / 2 ) + Math.cos( lat1 * Math.PI / 180 ) * Math.cos( lat2 * Math.PI / 180 ) * Math.sin( dlon / 2 ) * Math.sin( dlon / 2 );
-        let c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
-        let d = this.radius * c;
-
-        return Math.round( d );
-    }
-
-    distanceToGo = ( lat1, lon1, planelat1, planelon1 ) => {
-        let dlat = ( lat1 - planelat1 ) * Math.PI / 180;
-        let dlon = ( lon1 - planelon1 ) * Math.PI / 180;
-
-        let a = Math.sin( dlat / 2 ) * Math.sin( dlat / 2 ) + Math.cos( lat1 * Math.PI / 180 ) * Math.cos( planelat1 * Math.PI / 180 ) * Math.sin( dlon / 2 ) * Math.sin( dlon / 2 );
-        let c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
-        let d = this.radius * c;
-
-        return Math.round( d );
-    }
-
-    timeOfArrival = ( hours, minutes, timedifference, timezone ) => {
-        let hoursMs = hours * 3.6e+6;
-        let minutesMs = minutes * 60000;
-        let timeLeft = hoursMs + minutesMs;
-
-        let date = new Date();
-        let timenow = date.getTime();
-
-        let milliseconds = Math.abs( 3.6e+6 * timedifference );
-        let arrivaltime = 0;
-
-        if( parseInt( timedifference ) < 0 ) {
-            arrivaltime = timeLeft + ( timenow - milliseconds );
-        } else {
-            arrivaltime = timeLeft + ( timenow + milliseconds );
-        }
-
-        let arriving = new Date( arrivaltime );
-        let arrivalDay = arriving.getDay();
-        let arrivalDate = arriving.getDate();
-        let arrivalHour = arriving.getHours();
-        let arrivalMinutes = arriving.getMinutes();
-
-        let day, dateSuffix = '';
-
-        switch( arrivalDay ) {
-            case 0 : day = 'Sunday'; break;
-            case 1 : day = 'Monday'; break;
-            case 2 : day = 'Tuesday'; break;
-            case 3 : day = 'Wednesday'; break;
-            case 4 : day = 'Thursday'; break;
-            case 5 : day = 'Friday'; break;
-            case 6 : day = 'Saturday'; break;
-            default: day = '';
-        }
-
-        switch( arrivalDate ) {
-            case '1' :
-            case '21' :
-            case '31' : dateSuffix = 'st'; break;
-            case '2' :
-            case '22' : dateSuffix = 'nd'; break;
-            case '3' :
-            case '23' : dateSuffix = 'rd'; break;
-            default : dateSuffix = 'th';
-        }
-
-        return day + ' ' + arrivalDate + dateSuffix + ', ' + arrivalHour + ':' + arrivalMinutes + ' (' + timezone + ')';
-    }
-
-    flightTimeRemaining = ( remainingDistance, velocity ) => {
-        let time = remainingDistance / velocity;
-        let radixPos = String( time ).indexOf( '.' );
-        let decimalvalue = String( time ).slice( radixPos );
-
-        let hours = Math.floor( time );
-        let minutes = Math.round( decimalvalue * 60 );
-
-        return [ hours, minutes ];
-    }
-
     calcDistances = ( airportlocations, aircraftposition ) => {
         let lat1 = airportlocations.dest.destlat;
         let lat2 = airportlocations.org.orglat;
@@ -154,10 +75,10 @@ class App extends Component {
         let timedifference = airportlocations.dest.timedifference;
         let timezone = airportlocations.dest.timezone;
 
-        let distanceBetweenPorts = this.distanceBetweenAirports( lat1, lon1, lat2, lon2 );
-        let distanceToGo = this.distanceToGo( lat1, lon1, planelat1, planelon1 );
-        let hoursToGo = this.flightTimeRemaining( distanceToGo, planespeed );
-        let eta = this.timeOfArrival( hoursToGo[ 0 ], hoursToGo[ 1 ], timedifference, timezone );
+        let distanceBetweenPorts = distanceBetweenAirportsFunc( lat1, lon1, lat2, lon2 );
+        let distanceToGo = distanceToGoFunc( lat1, lon1, planelat1, planelon1 );
+        let hoursToGo = flightTimeRemainingFunc( distanceToGo, planespeed );
+        let eta = timeOfArrivalFunc( hoursToGo[ 0 ], hoursToGo[ 1 ], timedifference, timezone );
 
         this.setState({
             distance: Math.round( 100 - ( ( distanceToGo / distanceBetweenPorts ) * 100 ) ),
