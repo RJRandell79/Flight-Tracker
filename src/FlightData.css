@@ -1,16 +1,32 @@
 
 .flightdata {
     position: absolute;
-    left: 25px;
-    bottom: 50px;
-    width: 250px;
-    padding: 25px;
-    background: #F2F2F2;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    padding: 15px 15px 40px;
+    background: rgba( 255, 255, 255, 0.95 );
     box-shadow: 3px 3px 5px rgba( 0, 50, 0, 0.33 );
+    box-sizing: border-box;
+    z-index: 1;
 }
-.flightdata .airline,
-.flightdata .model,
+.flightdata .flightinfo-container {
+    overflow: hidden;
+}
+.flightdata .flightinfo-container .flightinfo {
+    float: left;
+    width: 180px;
+}
+.flightdata .flightinfo-container .flightimage {
+    float: right;
+    width: 85px;
+    height: 53px;
+    background: #DDD;
+}
+.flightdata .flightinfo-container .flightinfo .airline,
+.flightdata .flightinfo-container .flightinfo .model,
 .flightdata .count {
+    margin: 0;
     font-size: 12px;
 }
 .flightdata .origin,
@@ -47,4 +63,12 @@
 }
 .flightdata .count {
     margin: 0;
+}
+
+@media only screen and (max-width: 420px ) {
+    .flightdata {
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
 }

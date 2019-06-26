@@ -16,9 +16,15 @@ class FlightData extends Component {
 
         return(
             <div className="flightdata">
-                <p>{ callsign === undefined ? 'Flight No.: N/A' : callsign }</p>
-                <p className="airline">Airline: { ( airline === undefined || airline === '' ) ? 'N/A' : airline }</p>
-                <p className="model">Aircraft: { ( model === undefined || model === '' ) ? 'N/A' : model }</p>
+                <div className="flightinfo-container">
+                    <div className="flightinfo">
+                        <p>{ callsign === undefined ? 'Flight No.: N/A' : callsign }</p>
+                        <p className="airline">Airline: { ( airline === undefined || airline === '' ) ? 'N/A' : airline }</p>
+                        <p className="model">Aircraft: { ( model === undefined || model === '' ) ? 'N/A' : model }</p>
+                    </div>
+                    <div className="flightimage">
+                    </div>
+                </div>
                 <hr />
 
                 <div className="origin">
