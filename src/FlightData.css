@@ -21,7 +21,13 @@
     float: right;
     width: 85px;
     height: 53px;
+    padding: 2px;
     background: #DDD;
+    text-align: center;
+}
+.flightdata .flightinfo-container .flightimage img {
+    height: 100%;
+    object-fit: cover;
 }
 .flightdata .flightinfo-container .flightinfo .airline,
 .flightdata .flightinfo-container .flightinfo .model,

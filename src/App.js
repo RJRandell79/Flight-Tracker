@@ -36,6 +36,7 @@ class App extends Component {
         airplanes: [],
         flightinfo: [],
         aircraft: [],
+        aircraftImage: 'airplane-icon.png',
         origin: null,
         origingps: null,
         destination: null,
@@ -381,7 +382,7 @@ class App extends Component {
                 )}
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } eta = { this.state.timeOfArrival } mileage = { this.state.milesToGo } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } eta = { this.state.timeOfArrival } mileage = { this.state.milesToGo } aircraftimage = { this.state.aircraftImage } />
             </div>
         );
     }

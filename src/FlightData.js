@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import './FlightData.css';
+import AircraftImage from './aircraftImage.js';
 
 class FlightData extends Component {
 
     render() {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
+        const aircraftImage = this.props.aircraftimage;
         const searchingData = this.props.searchingair;
         const searchingRoute = this.props.searchingroute;
         const origin = this.props.origin;
@@ -22,8 +24,7 @@ class FlightData extends Component {
                         <p className="airline">Airline: { ( airline === undefined || airline === '' ) ? 'N/A' : airline }</p>
                         <p className="model">Aircraft: { ( model === undefined || model === '' ) ? 'N/A' : model }</p>
                     </div>
-                    <div className="flightimage">
-                    </div>
+                    <AircraftImage image = { aircraftImage } />
                 </div>
                 <hr />
 
