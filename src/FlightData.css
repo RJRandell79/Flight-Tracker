@@ -15,11 +15,11 @@
 }
 .flightdata .flightinfo-container .flightinfo {
     float: left;
-    width: 180px;
+    width: 160px;
 }
 .flightdata .flightinfo-container .flightimage {
     float: right;
-    width: 85px;
+    width: 100px;
     height: 53px;
     padding: 2px;
     background: #DDD;

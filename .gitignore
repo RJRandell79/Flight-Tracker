@@ -19,6 +19,7 @@
 .env.production.local
 config.js
 /src/data
+/src/aircraftphotos/*.jpg
 
 npm-debug.log*
 yarn-debug.log*

@@ -209,18 +209,22 @@ class App extends Component {
             return response.json()
         }).then( ( json ) => {
             if( json[ 'found' ][ 4 ] !== '' && json[ 'found' ][ 13 ] !== '' ) {
+                let str = json[ 'found' ][ 13 ] + '-' + json[ 'found' ][ 4 ];
+                let image = str.replace( /\s+/g, '-' ).toLowerCase();
                 this.setState({
                     flightinfo: {
                         callsign,
                         altitude,
                         velocity,
                         airline: json[ 'found' ][ 13 ],
-                        model: json[ 'found' ][ 4 ]
+                        model: json[ 'found' ][ 4 ],
                     },
+                    aircraftImage: image,
                     isSearchingAir: false
                 });
             } else {
                 this.setState({
+                    aircraftImage: 'airplane-icon.png',
                     isSearchingAir: false
                 });
                 alert( 'Flight information not found' );
