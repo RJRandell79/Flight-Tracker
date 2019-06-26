@@ -127,6 +127,14 @@ class App extends Component {
         }).then( ( json ) => {
             if( json[ 'error' ] ) {
                 this.setState({
+                    origin: '',
+                    origingps: '',
+                    destination: '',
+                    destinationgps: '',
+                    distance: 0,
+                    milesToGo: 0,
+                    hoursToGo: 0,
+                    timeOfArrival: '',
                     isSearchingRoute: false
                 });
                 alert( 'Flight route not available.' );
