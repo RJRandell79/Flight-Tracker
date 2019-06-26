@@ -16,7 +16,7 @@ class FlightData extends Component {
 
         return(
             <div className="flightdata">
-                <p>Flight Number: { callsign === undefined ? 'N/A' : callsign }</p>
+                <p>{ callsign === undefined ? 'Flight No.: N/A' : callsign }</p>
                 <p className="airline">Airline: { ( airline === undefined || airline === '' ) ? 'N/A' : airline }</p>
                 <p className="model">Aircraft: { ( model === undefined || model === '' ) ? 'N/A' : model }</p>
                 <hr />

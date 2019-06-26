@@ -125,50 +125,58 @@ class App extends Component {
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            this.setState({
-                origin: json[ 'org' ][ 1 ],
-                origingps: [ json[ 'org' ][ 6 ], json[ 'org' ][ 7 ] ],
-                destination: json[ 'dest' ][ 1 ],
-                destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
-                isSearchingRoute: false
-            });
-            this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timedifference: json[ 'dest' ][ 9 ], timezone: json[ 'dest' ][ 11 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
+            if( json[ 'error' ] ) {
+                this.setState({
+                    isSearchingRoute: false
+                });
+                alert( 'Flight route not available.' );
+            } else {
+                this.setState({
+                    origin: json[ 'org' ][ 1 ],
+                    origingps: [ json[ 'org' ][ 6 ], json[ 'org' ][ 7 ] ],
+                    destination: json[ 'dest' ][ 1 ],
+                    destinationgps: [ json[ 'dest' ][ 6 ], json[ 'dest' ][ 7 ] ],
+                    isSearchingRoute: false
+                });
 
-            const flightpathToGo = new MapboxLayer({
-                id: 'flightpathtogo',
-                type: LineLayer,
-                data: [{
-                    from: { position: [ longitude, latitude ] },
-                    to: { position: [ +json[ 'dest' ][ 7 ], +json[ 'dest' ][ 6 ] ] }
-                }],
-                getSourcePosition: d => d.from.position,
-                getTargetPosition: d => d.to.position,
-                getWidth: 2,
-                getColor: [ 0, 255, 0 ]
-            });
+                this.calcDistances( { org: { orglat: json[ 'org' ][ 6 ], orglng: json[ 'org' ][ 7 ] }, dest: { destlat: json[ 'dest' ][ 6 ], destlng: json[ 'dest' ][ 7 ], timedifference: json[ 'dest' ][ 9 ], timezone: json[ 'dest' ][ 11 ] } }, { plane: { lat: latitude, lng: longitude, speed: velocity } } );
 
-            const flightpathDone = new MapboxLayer({
-                id: 'flightpathdone',
-                type: LineLayer,
-                data: [{
-                    from: { position: [ +json[ 'org' ][ 7 ], +json[ 'org' ][ 6 ] ] },
-                    to: { position: [ longitude, latitude ] }
-                }],
-                getSourcePosition: d => d.from.position,
-                getTargetPosition: d => d.to.position,
-                getWidth: 2,
-                getColor: [ 0, 255, 0 ]
-            });
+                const flightpathToGo = new MapboxLayer({
+                    id: 'flightpathtogo',
+                    type: LineLayer,
+                    data: [{
+                        from: { position: [ longitude, latitude ] },
+                        to: { position: [ +json[ 'dest' ][ 7 ], +json[ 'dest' ][ 6 ] ] }
+                    }],
+                    getSourcePosition: d => d.from.position,
+                    getTargetPosition: d => d.to.position,
+                    getWidth: 2,
+                    getColor: [ 0, 255, 0 ]
+                });
 
-            this.map.addLayer( flightpathToGo );
-            this.map.addLayer( flightpathDone );
+                const flightpathDone = new MapboxLayer({
+                    id: 'flightpathdone',
+                    type: LineLayer,
+                    data: [{
+                        from: { position: [ +json[ 'org' ][ 7 ], +json[ 'org' ][ 6 ] ] },
+                        to: { position: [ longitude, latitude ] }
+                    }],
+                    getSourcePosition: d => d.from.position,
+                    getTargetPosition: d => d.to.position,
+                    getWidth: 2,
+                    getColor: [ 0, 255, 0 ]
+                });
 
-            flightpathToGo.setProps({
-                getColor: [ 0, 0, 255 ]
-            });
-            flightpathDone.setProps({
-                getColor: [ 255, 0, 0 ]
-            })
+                this.map.addLayer( flightpathToGo );
+                this.map.addLayer( flightpathDone );
+
+                flightpathToGo.setProps({
+                    getColor: [ 0, 0, 255 ]
+                });
+                flightpathDone.setProps({
+                    getColor: [ 255, 0, 0 ]
+                })
+            }
         });
     }
 
@@ -203,6 +211,9 @@ class App extends Component {
                     isSearchingAir: false
                 });
             } else {
+                this.setState({
+                    isSearchingAir: false
+                });
                 alert( 'Flight information not found' );
             }
         });
@@ -232,9 +243,9 @@ class App extends Component {
         this.timer = d3.timer( this.animationFrame );
     };
 
-    validateCallsign = ( callsign ) => {
+    validateCallsign = ( icao, callsign ) => {
         if( callsign === '' || callsign === undefined ) {
-            return 'FLIGHT NO. NOT AVAILABLE';
+            return 'ICAO: ' + icao;
         } else {
             return callsign;
         }
@@ -256,7 +267,7 @@ class App extends Component {
             ({ states }) => this.setState({
                 airplanes: states.map( d => ({
                     icao: d[ 0 ],
-                    callsign: this.validateCallsign( d[ 1 ] ),
+                    callsign: this.validateCallsign( d[ 0 ], d[ 1 ] ),
                     last_contact: d[ 4 ],
                     longitude: d[ 5 ],
                     latitude: d[ 6 ],
