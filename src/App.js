@@ -19,6 +19,7 @@ import distanceBetweenAirportsFunc from './distanceBetweenAirports.js';
 import flightTimeRemainingFunc from './flightTimeRemaining.js';
 
 const MAPBOX_ACCESS_TOKEN = CONFIG.mapboxapikey;
+const DARKSKY_KEY = CONFIG.darkskyapikey;
 const MAPBOX_STYLE = "mapbox://styles/robrandell/cj9jtcr56024l2rrxpdxuxmnf";
 const OPENSKY_USERNAME = CONFIG.openskyusername;
 const OPENSKY_PASSWORD = CONFIG.openskypassword;
@@ -33,6 +34,7 @@ const initialViewState = {
 
 class App extends Component {
     state = {
+        weather: [],
         airplanes: [],
         flightinfo: [],
         aircraft: [],
@@ -271,6 +273,16 @@ class App extends Component {
         return Math.round( metres * 3.281 );
     }
 
+    fetchWeather = () => {
+        fetch( 'http://dev.heckfordclients.co.uk/repeater.php?url=https://api.darksky.net/forecast/' + DARKSKY_KEY + '/' + initialViewState.latitude + ',' + initialViewState.longitude, {
+            method: 'GET'
+        }).then( ( response ) => {
+            return response.json()
+        }).then( ( json ) => {
+            console.log( json )
+        });
+    }
+
     fetchData = () => {
         d3.json( 'https://opensky-network.org/api/states/all?lamin=49.9289&lomin=-7.5062&lamax=58.589&lomax=1.6226', {
             headers: new Headers({
@@ -380,7 +392,7 @@ class App extends Component {
 
         return(
             <div className="flights-container">
-                <DeckGL ref = { ref => { this._deck = ref && ref.deck } } initialViewState = { initialViewState } controller = { true } layers = { layers } onClick={ this._onClick } onWebGLInitialized = { this._onWebGLInitialized }>
+                <DeckGL ref = { ref => { this._deck = ref && ref.deck } } initialViewState = { initialViewState } controller = { true } layers = { layers } onClick = { this._onClick } onWebGLInitialized = { this._onWebGLInitialized }>
                 { gl && (
                     <StaticMap ref = { ref => { this._map = ref && ref.getMap(); } } mapboxApiAccessToken = { MAPBOX_ACCESS_TOKEN } mapStyle = { MAPBOX_STYLE } onLoad = { this._onMapLoad } />
                 )}
@@ -393,6 +405,7 @@ class App extends Component {
 
     componentDidMount() {
         this.fetchData();
+        this.fetchWeather();
     }
 
 }
