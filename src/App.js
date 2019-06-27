@@ -234,6 +234,7 @@ class App extends Component {
         });
 
         this.getFlightRoute( callsign, latitude, longitude, velocity );
+        this.fetchWeather( latitude, longitude, altitude );
     }
 
     animationFrame = () => {
@@ -273,13 +274,24 @@ class App extends Component {
         return Math.round( metres * 3.281 );
     }
 
-    fetchWeather = () => {
-        fetch( 'http://dev.heckfordclients.co.uk/repeater.php?url=https://api.darksky.net/forecast/' + DARKSKY_KEY + '/' + initialViewState.latitude + ',' + initialViewState.longitude, {
+    fetchWeather = ( latitude, longitude, altitude ) => {
+        fetch( 'http://dev.heckfordclients.co.uk/repeater.php?url=https://api.darksky.net/forecast/' + DARKSKY_KEY + '/' + latitude + ',' + longitude, {
             method: 'GET'
         }).then( ( response ) => {
             return response.json()
         }).then( ( json ) => {
-            console.log( json )
+            let celsius = ( ( json.currently.apparentTemperature - 32 ) / 1.8 ).toFixed( 1 );
+            let airtemp = Math.round( ( ( ( json.currently.apparentTemperature - ( 3.5 * ( altitude / 1000 ) ) ) ) - 32 ) / 1.8 );
+
+            this.setState({
+                weather: {
+                    cloudcover: json.currently.cloudCover,
+                    temp: celsius,
+                    airtemp: airtemp,
+                    windspeed: json.currently.windSpeed,
+                    windbearing: json.currently.windBearing
+                }
+            })
         });
     }
 
@@ -398,14 +410,13 @@ class App extends Component {
                 )}
                 </DeckGL>
 
-                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } eta = { this.state.timeOfArrival } mileage = { this.state.milesToGo } aircraftimage = { this.state.aircraftImage } />
+                <FlightData flight = { this.state.flightinfo } searchingair = { this.state.isSearchingAir } searchingroute = { this.state.isSearchingRoute } origin = { this.state.origin } destination = { this.state.destination } widthpercentage = { this.state.distance } hourstogo = { this.state.hoursToGo } eta = { this.state.timeOfArrival } mileage = { this.state.milesToGo } aircraftimage = { this.state.aircraftImage } weather = { this.state.weather } />
             </div>
         );
     }
 
     componentDidMount() {
         this.fetchData();
-        this.fetchWeather();
     }
 
 }
