@@ -285,10 +285,11 @@ class App extends Component {
 
             this.setState({
                 weather: {
-                    cloudcover: json.currently.cloudCover,
+                    icon: json.currently.icon,
+                    cloudcover: Math.floor( json.currently.cloudCover * 100 ),
                     temp: celsius,
                     airtemp: airtemp,
-                    windspeed: json.currently.windSpeed,
+                    windspeed: this.convertToMPH( json.currently.windSpeed ),
                     windbearing: json.currently.windBearing
                 }
             })

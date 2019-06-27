@@ -64,6 +64,81 @@
     height: 3px;
     background: #F00;
 }
+.flightdata .weather-console {
+    width: 100%;
+    padding: 5px;
+    margin: 0 0 15px;
+    background: #DDD;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.flightdata .weather-console .air {
+    padding: 3px 0 0;
+    border-top: 1px solid #FFF;
+}
+.flightdata .weather-console .ground,
+.flightdata .weather-console .air {
+    overflow: hidden;
+}
+.flightdata .weather-console .ground p,
+.flightdata .weather-console .air p,
+.flightdata .weather-console .labels p {
+    float: left;
+    width: 50%;
+    font-size: 12px;
+    font-weight: 700;
+}
+.flightdata .weather-console .labels p {
+    font-weight: 400;
+}
+.flightdata .weather-console .ground p:last-of-type,
+.flightdata .weather-console .air p:last-of-type,
+.flightdata .weather-console .labels p:last-of-type {
+    float: right;
+    text-align: right;
+}
+.flightdata .weather-console .temperature {
+    display: block;
+    position: relative;
+    width: 100%;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+}
+.flightdata .weather-console .airtemp {
+    margin: 0 20px 0 0;
+}
+.flightdata .weather-console .labels p {
+    width: 33%;
+}
+.flightdata .weather-console .labels p.center-text {
+    text-align: center;
+}
+.flightdata .weather-console .temperature p {
+    font-size: 12px;
+}
+.flightdata .weather-console .temperature .graph {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    margin: 0 0 3px;
+    background: #BBB;
+}
+.flightdata .weather-console .temperature .graph .divider,
+.flightdata .weather-console .airtemp .graph .divider,
+.flightdata .weather-console .temperature .graph .bar,
+.flightdata .weather-console .airtemp .graph .bar {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    height: 6px;
+    background: #FFF;
+}
+.flightdata .weather-console .temperature .graph .bar,
+.flightdata .weather-console .airtemp .graph .bar {
+    background: #F00;
+    transition: all 0.5s ease-in;
+}
 .flightdata p {
     margin: 0 0 5px;
 }

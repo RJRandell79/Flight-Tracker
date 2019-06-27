@@ -4,6 +4,18 @@ import AircraftImage from './aircraftImage.js';
 
 class FlightData extends Component {
 
+    setTempBar = ( temp ) => {
+        let percentage = ( temp / 100 ) * 100;
+        let barStyle;
+
+        if( temp < 0 ) {
+            barStyle = { width: Math.abs( percentage ) + '%',  transform: `translateX( -100% )`, background: `#00F` }
+        } else {
+            barStyle = { width: percentage + '%',  transform: `translateX( 0 )` }
+        }
+        return barStyle;
+    }
+
     render() {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
         const aircraftImage = this.props.aircraftimage;
@@ -15,6 +27,7 @@ class FlightData extends Component {
         const milesToGo = this.props.mileage;
         const hoursToGo = this.props.hourstogo;
         const timeOfArrival = this.props.eta;
+        const weather = this.props.weather;
 
         return(
             <div className="flightdata">
@@ -45,6 +58,56 @@ class FlightData extends Component {
                 <p>Calibrated altitude: { altitude === undefined ? 'n/a' : altitude + 'ft' }</p>
                 <p>Ground speed: { velocity === undefined ? 'n/a' : velocity + 'mph' }</p>
                 <hr />
+
+                <div className="weather-console">
+                    <div class="ground">
+                        <p>Ground temperature:</p>
+                        <p>{ ( weather.temp === undefined || weather.temp === '' ) ? 'N/A' : weather.temp + 'ºC' }</p>
+                    </div>
+
+                    <div className="temperature">
+                        <div className="graph">
+                            <span className="bar" style={ this.setTempBar( weather.temp ) }></span>
+                            <span className="divider"></span>
+                        </div>
+                        <div className="labels">
+                            <p>-60ºC</p>
+                            <p className="center-text">0ºC</p>
+                            <p>60ºC</p>
+                        </div>
+                    </div>
+
+                    <div class="air">
+                        <p>Air temperature:</p>
+                        <p>{ ( weather.airtemp === undefined || weather.airtemp === '' ) ? 'N/A' : weather.airtemp + 'ºC at ' + altitude + 'ft' }</p>
+                    </div>
+
+                    <div className="temperature">
+                        <div className="graph">
+                            <span className="bar" style={ this.setTempBar( weather.airtemp ) }></span>
+                            <span className="divider"></span>
+                        </div>
+                        <div className="labels">
+                            <p>-60ºC</p>
+                            <p className="center-text">0ºC</p>
+                            <p>60ºC</p>
+                        </div>
+                    </div>
+
+
+                    <div className="altitude">
+
+                    </div>
+                </div>
+
+                <div className="weather">
+                    <p>Icon: { ( weather.icon === undefined || weather.icon === '' ) ? 'N/A' : weather.icon }</p>
+                    <p>Cloud cover: { ( weather.cloudcover === undefined || weather.cloudcover === '' ) ? 'N/A' : weather.cloudcover + '%' }</p>
+                    <p>Wind speed: { ( weather.windspeed === undefined || weather.windspeed === '' ) ? 'N/A' : weather.windspeed + 'mph' }</p>
+                    <p>Wind bearing: { ( weather.windbearing === undefined || weather.windbearing === '' ) ? 'N/A' : weather.windbearing + 'º' }</p>
+                </div>
+                <hr />
+
                 { searchingData ? <p className="count">Searching airlines/aircraft...</p> : null }
                 { searchingRoute ? <p className="count">Searching route...</p> : null }
             </div>
