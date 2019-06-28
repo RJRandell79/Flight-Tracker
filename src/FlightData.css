@@ -72,16 +72,28 @@
     overflow: hidden;
     box-sizing: border-box;
 }
-.flightdata .weather-console .air {
+.flightdata .weather-console .air,
+.flightdata .weather-console .height,
+.flightdata .weather-console .cover,
+.flightdata .weather-console .speed {
     padding: 3px 0 0;
     border-top: 1px solid #FFF;
 }
 .flightdata .weather-console .ground,
-.flightdata .weather-console .air {
+.flightdata .weather-console .air,
+.flightdata .weather-console .height,
+.flightdata .weather-console .altitude,
+.flightdata .weather-console .speed,
+.flightdata .weather-console .groundspeed,
+.flightdata .weather-console .cover,
+.flightdata .weather-console .cloud {
     overflow: hidden;
 }
 .flightdata .weather-console .ground p,
 .flightdata .weather-console .air p,
+.flightdata .weather-console .height p,
+.flightdata .weather-console .cover p,
+.flightdata .weather-console .speed p,
 .flightdata .weather-console .labels p {
     float: left;
     width: 50%;
@@ -93,6 +105,9 @@
 }
 .flightdata .weather-console .ground p:last-of-type,
 .flightdata .weather-console .air p:last-of-type,
+.flightdata .weather-console .height p:last-of-type,
+.flightdata .weather-console .cover p:last-of-type,
+.flightdata .weather-console .speed p:last-of-type,
 .flightdata .weather-console .labels p:last-of-type {
     float: right;
     text-align: right;
@@ -113,10 +128,16 @@
 .flightdata .weather-console .labels p.center-text {
     text-align: center;
 }
-.flightdata .weather-console .temperature p {
+.flightdata .weather-console .temperature p,
+.flightdata .weather-console .height p,
+.flightdata .weather-console .cover p,
+.flightdata .weather-console .speed p {
     font-size: 12px;
 }
-.flightdata .weather-console .temperature .graph {
+.flightdata .weather-console .temperature .graph,
+.flightdata .weather-console .altitude .graph,
+.flightdata .weather-console .cloud .graph,
+.flightdata .weather-console .groundspeed .graph {
     position: relative;
     width: 100%;
     height: 6px;
@@ -126,7 +147,10 @@
 .flightdata .weather-console .temperature .graph .divider,
 .flightdata .weather-console .airtemp .graph .divider,
 .flightdata .weather-console .temperature .graph .bar,
-.flightdata .weather-console .airtemp .graph .bar {
+.flightdata .weather-console .airtemp .graph .bar,
+.flightdata .weather-console .altitude .graph .bar,
+.flightdata .weather-console .cloud .graph .bar,
+.flightdata .weather-console .groundspeed .graph .bar {
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -134,8 +158,17 @@
     height: 6px;
     background: #FFF;
 }
+.flightdata .weather-console .altitude .graph .bar,
+.flightdata .weather-console .cloud .graph .bar,
+.flightdata .weather-console .groundspeed .graph .bar {
+    width: 0;
+    left: 0;
+}
 .flightdata .weather-console .temperature .graph .bar,
-.flightdata .weather-console .airtemp .graph .bar {
+.flightdata .weather-console .airtemp .graph .bar,
+.flightdata .weather-console .altitude .graph .bar,
+.flightdata .weather-console .cloud .graph .bar,
+.flightdata .weather-console .groundspeed .graph .bar {
     background: #F00;
     transition: all 0.5s ease-in;
 }

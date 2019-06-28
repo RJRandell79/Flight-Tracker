@@ -16,6 +16,27 @@ class FlightData extends Component {
         return barStyle;
     }
 
+    setAltitude = ( height ) => {
+        let percentage = ( height / 50000 ) * 100;
+        let barStyle = { width: percentage + '%' }
+
+        return barStyle;
+    }
+
+    setPercentage = ( value ) => {
+        let percentage = ( value / 100 ) * 100;
+        let barStyle = { width: percentage + '%' }
+
+        return barStyle;
+    }
+
+    setSpeed = ( velocity ) => {
+        let percentage = ( velocity / 750 ) * 100;
+        let barStyle = { width: percentage + '%' }
+
+        return barStyle;
+    }
+
     render() {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
         const aircraftImage = this.props.aircraftimage;
@@ -55,10 +76,6 @@ class FlightData extends Component {
                 </div>
                 <hr />
 
-                <p>Calibrated altitude: { altitude === undefined ? 'n/a' : altitude + 'ft' }</p>
-                <p>Ground speed: { velocity === undefined ? 'n/a' : velocity + 'mph' }</p>
-                <hr />
-
                 <div className="weather-console">
                     <div class="ground">
                         <p>Ground temperature:</p>
@@ -94,15 +111,55 @@ class FlightData extends Component {
                         </div>
                     </div>
 
+                    <div class="height">
+                        <p>Altitude:</p>
+                        <p>{ ( altitude === undefined || altitude === '' ) ? 'N/A' : altitude + 'ft' }</p>
+                    </div>
 
                     <div className="altitude">
-
+                        <div className="graph">
+                            <span className="bar" style={ this.setAltitude( altitude ) }></span>
+                        </div>
+                        <div className="labels">
+                            <p>0ft</p>
+                            <p>50000ft</p>
+                        </div>
                     </div>
+
+                    <div className="cover">
+                        <p>Cloud cover:</p>
+                        <p>{ ( weather.cloudcover === undefined || weather.cloudcover === '' ) ? 'N/A' : weather.cloudcover + '%' }</p>
+                    </div>
+
+                    <div className="cloud">
+                        <div className="graph">
+                            <span className="bar" style={ this.setPercentage( weather.cloudcover ) }></span>
+                        </div>
+                        <div className="labels">
+                            <p>0%</p>
+                            <p>100%</p>
+                        </div>
+                    </div>
+
+                    <div className="speed">
+                        <p>Ground speed:</p>
+                        <p>{ velocity === undefined ? 'n/a' : velocity + 'mph' }</p>
+                    </div>
+
+                    <div className="groundspeed">
+                        <div className="graph">
+                            <span className="bar" style={ this.setSpeed( velocity ) }></span>
+                        </div>
+                        <div className="labels">
+                            <p>0mph</p>
+                            <p>700mph</p>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div className="weather">
                     <p>Icon: { ( weather.icon === undefined || weather.icon === '' ) ? 'N/A' : weather.icon }</p>
-                    <p>Cloud cover: { ( weather.cloudcover === undefined || weather.cloudcover === '' ) ? 'N/A' : weather.cloudcover + '%' }</p>
                     <p>Wind speed: { ( weather.windspeed === undefined || weather.windspeed === '' ) ? 'N/A' : weather.windspeed + 'mph' }</p>
                     <p>Wind bearing: { ( weather.windbearing === undefined || weather.windbearing === '' ) ? 'N/A' : weather.windbearing + 'º' }</p>
                 </div>
