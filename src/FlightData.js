@@ -37,6 +37,19 @@ class FlightData extends Component {
         return barStyle;
     }
 
+    setWindDirection = ( angle ) => {
+        let rotation = { transform: `rotate( ${ angle }deg )` }
+
+        return rotation;
+    }
+
+    setWindSpeed = ( speed ) => {
+        let revolutions = ( 100 - speed ) / 5;
+        let animation = { animation: `spin ${ revolutions }s linear infinite` }
+
+        return animation;
+    }
+
     render() {
         const { callsign, airline, model, altitude, velocity } = this.props.flight;
         const aircraftImage = this.props.aircraftimage;
@@ -77,7 +90,7 @@ class FlightData extends Component {
                 <hr />
 
                 <div className="weather-console">
-                    <div class="ground">
+                    <div className="ground">
                         <p>Ground temperature:</p>
                         <p>{ ( weather.temp === undefined || weather.temp === '' ) ? 'N/A' : weather.temp + 'ºC' }</p>
                     </div>
@@ -94,7 +107,7 @@ class FlightData extends Component {
                         </div>
                     </div>
 
-                    <div class="air">
+                    <div className="air">
                         <p>Air temperature:</p>
                         <p>{ ( weather.airtemp === undefined || weather.airtemp === '' ) ? 'N/A' : weather.airtemp + 'ºC at ' + altitude + 'ft' }</p>
                     </div>
@@ -111,7 +124,7 @@ class FlightData extends Component {
                         </div>
                     </div>
 
-                    <div class="height">
+                    <div className="height">
                         <p>Altitude:</p>
                         <p>{ ( altitude === undefined || altitude === '' ) ? 'N/A' : altitude + 'ft' }</p>
                     </div>
@@ -156,12 +169,31 @@ class FlightData extends Component {
                         </div>
                     </div>
 
-                </div>
+                    <div className="weather-icons">
+                        <div className="weather-label">
+                            <p>Other information:</p>
+                        </div>
 
-                <div className="weather">
-                    <p>Icon: { ( weather.icon === undefined || weather.icon === '' ) ? 'N/A' : weather.icon }</p>
-                    <p>Wind speed: { ( weather.windspeed === undefined || weather.windspeed === '' ) ? 'N/A' : weather.windspeed + 'mph' }</p>
-                    <p>Wind bearing: { ( weather.windbearing === undefined || weather.windbearing === '' ) ? 'N/A' : weather.windbearing + 'º' }</p>
+                        <div className="icon">
+                            <div className="image"></div>
+                            <p>Icon: { ( weather.summary === undefined || weather.summary === '' ) ? 'N/A' : weather.summary }</p>
+                        </div>
+                        <div className="icon windbearing">
+                            <div className="compass">
+                                <div className="needle" style={ this.setWindDirection( weather.windbearing ) }></div>
+                            </div>
+                            <p>Wind bearing: { ( weather.windbearing === undefined || weather.windbearing === '' ) ? 'N/A' : weather.windbearing + 'º' }</p>
+                        </div>
+                        <div className="icon windspeed">
+                            <div className="compass">
+                                <div className="blades" style={ this.setWindSpeed( weather.windspeed ) }>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <p>Wind speed: { ( weather.windspeed === undefined || weather.windspeed === '' ) ? 'N/A' : weather.windspeed + 'mph' }</p>
+                        </div>
+                    </div>
                 </div>
                 <hr />
 
