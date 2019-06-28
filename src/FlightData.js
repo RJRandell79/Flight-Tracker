@@ -71,9 +71,9 @@ class FlightData extends Component {
                             <span className="divider"></span>
                         </div>
                         <div className="labels">
-                            <p>-60ºC</p>
+                            <p>-50ºC</p>
                             <p className="center-text">0ºC</p>
-                            <p>60ºC</p>
+                            <p>50ºC</p>
                         </div>
                     </div>
 
@@ -88,9 +88,9 @@ class FlightData extends Component {
                             <span className="divider"></span>
                         </div>
                         <div className="labels">
-                            <p>-60ºC</p>
+                            <p>-50ºC</p>
                             <p className="center-text">0ºC</p>
-                            <p>60ºC</p>
+                            <p>50ºC</p>
                         </div>
                     </div>
 
